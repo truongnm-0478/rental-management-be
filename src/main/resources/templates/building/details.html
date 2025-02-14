@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Chi Tiết Tòa Nhà</title>
+</head>
+<body>
+<h1 th:text="${building.name}"></h1>
+<p>Địa Chỉ: <span th:text="${building.address}"></span></p>
+<p>Số Phòng: <span th:text="${building.numberOfRooms}"></span></p>
+<p>Giá Tiền: <span th:text="${building.price}"></span></p>
+</body>
+</html>

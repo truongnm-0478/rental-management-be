@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Danh sách Tòa Nhà</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.16.13/antd.min.css" />
+
+    <!-- Thêm thẻ meta để thiết kế responsive (tùy chọn) -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+<body>
+<div class="container">
+    <h2>運営している全ての部屋を登録しましょう。</h2>
+
+    <!-- Sử dụng Table của Ant Design -->
+    <table class="ant-table ant-table-bordered">
+        <thead class="ant-table-thead">
+        <tr>
+            <th>Tên Tòa Nhà</th>
+            <th>Địa Chỉ</th>
+            <th>Số Phòng</th>
+            <th>Giá Tiền</th>
+        </tr>
+        </thead>
+        <tbody class="ant-table-tbody">
+        <tr th:each="building : ${buildings}">
+            <td th:text="${building.name}"></td>
+            <td th:text="${building.address}"></td>
+            <td th:text="${building.numberOfRooms}"></td>
+            <td th:text="${building.price}"></td>
+            <td><a th:href="@{/buildings/{id}(id=${building.id})}">Xem Chi Tiết</a></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Thêm thư viện JS của Ant Design (tùy chọn) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/antd/4.16.13/antd.min.js"></script>
+</body>
+</html>
