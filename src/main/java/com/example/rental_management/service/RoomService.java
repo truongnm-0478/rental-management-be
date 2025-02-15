@@ -10,7 +10,7 @@ import java.util.Optional;
 public interface RoomService {
     Page<RoomResponse> getAllRooms(int page, int size);
 
-    Optional<Room> getRoomById(Long id);
+    RoomResponse getRoomById(Long id);
 
     Room saveRoom(Room room);
 

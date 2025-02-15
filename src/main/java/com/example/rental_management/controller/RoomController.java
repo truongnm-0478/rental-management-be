@@ -18,7 +18,7 @@ public class RoomController {
     @Autowired
     private RoomService roomService;
 
-    // Lấy danh sách phòng
+    // Get all room
     @GetMapping
     public Page<RoomResponse> getAllRooms(
             @RequestParam(defaultValue = "0") int page,
@@ -27,14 +27,14 @@ public class RoomController {
         return roomService.getAllRooms(page, size);
     }
 
-    // Lấy thông tin phòng theo ID
+    // Get room by id
     @GetMapping("/{id}")
-    public ResponseEntity<Room> getRoomById(@PathVariable Long id) {
-        Optional<Room> room = roomService.getRoomById(id);
-        return room.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<RoomResponse> getRoomById(@PathVariable Long id) {
+        RoomResponse room = roomService.getRoomById(id);
+        return ResponseEntity.ok(room);
     }
 
-    // Thêm phòng mới
+    // Create room
     @PostMapping
     public ResponseEntity<Room> createRoom(@RequestBody Room room) {
         if (room.getStatus() != RoomStatus.AVAILABLE && room.getStatus() != RoomStatus.RENTED) {
@@ -44,7 +44,7 @@ public class RoomController {
         return ResponseEntity.ok(savedRoom);
     }
 
-    // Cập nhật thông tin phòng
+    // Update room
 //    @PutMapping("/{id}")
 //    public ResponseEntity<Room> updateRoom(@PathVariable Long id, @RequestBody Room roomDetails) {
 //        Optional<Room> optionalRoom = roomService.getRoomById(id);
@@ -59,7 +59,7 @@ public class RoomController {
 //        return ResponseEntity.notFound().build();
 //    }
 
-    // Xóa phòng
+    // Delete room
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteRoom(@PathVariable Long id) {
         roomService.deleteRoom(id);

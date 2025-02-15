@@ -5,6 +5,8 @@ import com.example.rental_management.entity.Image;
 import com.example.rental_management.entity.Room;
 import com.example.rental_management.repository.RoomRepository;
 import com.example.rental_management.service.RoomService;
+import com.example.rental_management.util.exception.ResourceNotFoundException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -16,32 +18,10 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class RoomServiceImpl implements RoomService {
     @Autowired
     private RoomRepository roomRepository;
-
-//    public List<RoomResponse> getAllRooms() {
-//        List<Room> rooms = roomRepository.findByDeletedAtIsNullAndBuilding_DeletedAtIsNull();
-//
-//        return rooms.stream().map(room -> {
-//            RoomResponse response = new RoomResponse();
-//            response.setId(room.getId());
-//            response.setRoomNumber(room.getName());
-//            response.setType(room.getType());
-//            response.setAddress(room.getBuilding().getAddress());
-//            response.setBuilding(room.getBuilding().getName());
-//            response.setShortPrice(room.getShortPrice());
-//            response.setMidPrice(room.getMidPrice());
-//            response.setStatus(room.getStatus());
-//
-//            List<String> imageUrls = room.getImages().stream()
-//                    .map(Image::getUrl)
-//                    .collect(Collectors.toList());
-//            response.setImages(imageUrls);
-//
-//            return response;
-//        }).collect(Collectors.toList());
-//    }
 
     public Page<RoomResponse> getAllRooms(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
@@ -66,8 +46,26 @@ public class RoomServiceImpl implements RoomService {
         });
     }
 
-    public Optional<Room> getRoomById(Long id) {
-        return roomRepository.findById(id);
+    public RoomResponse getRoomById(Long id) {
+        Room room = roomRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Room not found with ID: " + id));
+
+        RoomResponse response = new RoomResponse();
+        response.setId(room.getId());
+        response.setRoomNumber(room.getName());
+        response.setType(room.getType());
+        response.setAddress(room.getBuilding().getAddress());
+        response.setBuilding(room.getBuilding().getName());
+        response.setShortPrice(room.getShortPrice());
+        response.setMidPrice(room.getMidPrice());
+        response.setStatus(room.getStatus());
+
+        List<String> imageUrls = room.getImages().stream()
+                .map(Image::getUrl)
+                .collect(Collectors.toList());
+        response.setImages(imageUrls);
+
+        return response;
     }
 
     public Room saveRoom(Room room) {
