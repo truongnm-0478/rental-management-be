@@ -1,6 +1,6 @@
 package com.example.rental_management.controller;
 
-import com.example.rental_management.model.Building;
+import com.example.rental_management.entity.Building;
 import com.example.rental_management.service.BuildingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
