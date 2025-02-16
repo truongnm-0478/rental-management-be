@@ -12,6 +12,7 @@ import com.example.rental_management.repository.RoomRepository;
 import com.example.rental_management.service.CloudinaryService;
 import com.example.rental_management.service.RoomService;
 import com.example.rental_management.util.exception.ResourceNotFoundException;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -20,6 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -40,6 +42,7 @@ public class RoomServiceImpl implements RoomService {
         this.cloudinaryService = cloudinaryService;
     }
 
+    @Override
     public Page<RoomResponse> getAllRooms(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Room> roomsPage = roomRepository.findByDeletedAtIsNullAndBuilding_DeletedAtIsNull(pageable);
@@ -63,6 +66,7 @@ public class RoomServiceImpl implements RoomService {
         });
     }
 
+    @Override
     public RoomResponse getRoomById(Long id) {
         Room room = roomRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Room not found with ID: " + id));
@@ -86,7 +90,6 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
-
     public Room createRoom(RoomRequest roomRequest) {
         // Find building
         Optional<Building> optionalBuilding = buildingRepository.findByName(roomRequest.getBuilding());
@@ -135,7 +138,12 @@ public class RoomServiceImpl implements RoomService {
         return savedRoom;
     }
 
+    @Override
     public void deleteRoom(Long id) {
-        roomRepository.deleteById(id);
+        Room room = roomRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Room does not exits"));
+
+        room.setDeletedAt(LocalDateTime.now());
+        roomRepository.save(room);
     }
 }
