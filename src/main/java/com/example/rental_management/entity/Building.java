@@ -37,7 +37,8 @@ public class Building {
     private List<Room> rooms;
 
     @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    @Temporal(TemporalType.TIMESTAMP)
+    private LocalDateTime createdAt = LocalDateTime.now();;
 
     private LocalDateTime updatedAt;
 
@@ -46,5 +47,10 @@ public class Building {
     @PreUpdate
     private void preUpdate() {
         this.updatedAt = LocalDateTime.now();
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
     }
 }

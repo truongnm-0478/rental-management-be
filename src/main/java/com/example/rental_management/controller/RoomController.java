@@ -1,5 +1,6 @@
 package com.example.rental_management.controller;
 
+import com.example.rental_management.dto.request.RoomRequest;
 import com.example.rental_management.dto.response.RoomResponse;
 import com.example.rental_management.entity.Room;
 import com.example.rental_management.entity.enums.RoomStatus;
@@ -9,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,11 +38,9 @@ public class RoomController {
 
     // Create room
     @PostMapping
-    public ResponseEntity<Room> createRoom(@RequestBody Room room) {
-        if (room.getStatus() != RoomStatus.AVAILABLE && room.getStatus() != RoomStatus.RENTED) {
-            return ResponseEntity.badRequest().build(); // Trả về lỗi 400 mà không cần `body(null)`
-        }
-        Room savedRoom = roomService.saveRoom(room);
+    public ResponseEntity<Room> createRoom(@ModelAttribute RoomRequest roomRequest) {
+        System.out.println("SS: "+ roomRequest);
+        Room savedRoom = roomService.createRoom(roomRequest);
         return ResponseEntity.ok(savedRoom);
     }
 

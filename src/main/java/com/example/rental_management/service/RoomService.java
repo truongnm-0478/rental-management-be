@@ -1,5 +1,6 @@
 package com.example.rental_management.service;
 
+import com.example.rental_management.dto.request.RoomRequest;
 import com.example.rental_management.dto.response.RoomResponse;
 import com.example.rental_management.entity.Room;
 import org.springframework.data.domain.Page;
@@ -12,7 +13,7 @@ public interface RoomService {
 
     RoomResponse getRoomById(Long id);
 
-    Room saveRoom(Room room);
+    Room createRoom(RoomRequest roomRequest);
 
     void deleteRoom(Long id);
 }
