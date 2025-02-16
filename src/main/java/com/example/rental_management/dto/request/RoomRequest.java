@@ -21,4 +21,19 @@ public class RoomRequest {
     private Double area;
     private RoomStatus status;
     private MultipartFile image;
+
+    @Override
+    public String toString() {
+        return "RoomRequest{" +
+                "roomNumber='" + roomNumber + '\'' +
+                ", type='" + type + '\'' +
+                ", address='" + address + '\'' +
+                ", building='" + building + '\'' +
+                ", shortPrice=" + shortPrice +
+                ", midPrice=" + midPrice +
+                ", area=" + area +
+                ", status=" + status +
+                ", image=" + image +
+                '}';
+    }
 }

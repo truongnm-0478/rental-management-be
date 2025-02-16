@@ -39,25 +39,21 @@ public class RoomController {
     // Create room
     @PostMapping
     public ResponseEntity<Room> createRoom(@ModelAttribute RoomRequest roomRequest) {
-        System.out.println("SS: "+ roomRequest);
         Room savedRoom = roomService.createRoom(roomRequest);
         return ResponseEntity.ok(savedRoom);
     }
 
     // Update room
-//    @PutMapping("/{id}")
-//    public ResponseEntity<Room> updateRoom(@PathVariable Long id, @RequestBody Room roomDetails) {
-//        Optional<Room> optionalRoom = roomService.getRoomById(id);
-//        if (optionalRoom.isPresent()) {
-//            Room room = optionalRoom.get();
-//            room.setName(roomDetails.getName());
-//            room.setPrice(roomDetails.getPrice());
-//            room.setArea(roomDetails.getArea());
-//            room.setStatus(roomDetails.getStatus());
-//            return ResponseEntity.ok(roomService.saveRoom(room));
-//        }
-//        return ResponseEntity.notFound().build();
-//    }
+    @PutMapping("/{id}")
+    public ResponseEntity<RoomResponse> updateRoom(
+            @PathVariable Long id,
+            @ModelAttribute RoomRequest roomRequest
+    ) {
+        System.out.println("CHECK: " + roomRequest.toString());
+        RoomResponse updatedRoom = roomService.updateRoom(id, roomRequest);
+        return ResponseEntity.ok(updatedRoom);
+    }
+
 
     // Delete room
     @DeleteMapping("/{id}")

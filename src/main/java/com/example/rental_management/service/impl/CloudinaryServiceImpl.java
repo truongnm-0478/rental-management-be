@@ -29,4 +29,21 @@ public class CloudinaryServiceImpl implements CloudinaryService {
             throw new RuntimeException("Error when upload to Cloudinary", e);
         }
     }
+
+    public void deleteImage(String imageUrl) {
+        try {
+            String publicId = extractPublicId(imageUrl);
+
+            cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
+        } catch (Exception e) {
+            throw new RuntimeException("Error when deleting image from Cloudinary", e);
+        }
+    }
+
+    private String extractPublicId(String imageUrl) {
+        String[] parts = imageUrl.split("/");
+        String publicIdWithExtension = parts[parts.length - 1];
+
+        return publicIdWithExtension.substring(0, publicIdWithExtension.lastIndexOf('.'));
+    }
 }

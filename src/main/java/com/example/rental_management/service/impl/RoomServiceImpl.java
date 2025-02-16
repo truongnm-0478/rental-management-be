@@ -19,6 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
@@ -118,7 +119,7 @@ public class RoomServiceImpl implements RoomService {
                 .build();
         Room savedRoom = roomRepository.save(room);
 
-        // Update number of room on Building
+        // Update number of room in Building
         building.setNumberOfRooms(building.getNumberOfRooms() + 1);
         buildingRepository.save(building);
 
@@ -146,4 +147,88 @@ public class RoomServiceImpl implements RoomService {
         room.setDeletedAt(LocalDateTime.now());
         roomRepository.save(room);
     }
+
+    @Override
+    @Transactional
+    public RoomResponse updateRoom(Long id, RoomRequest roomRequest) {
+        Room room = roomRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Room does not exist"));
+
+        room.setName(roomRequest.getRoomNumber());
+        room.setType(roomRequest.getType());
+        room.setShortPrice(roomRequest.getShortPrice() != null ? roomRequest.getShortPrice() : room.getShortPrice());
+        room.setMidPrice(roomRequest.getMidPrice() != null ? roomRequest.getMidPrice() : room.getMidPrice());
+        room.setArea(roomRequest.getArea() != null ? roomRequest.getArea() : room.getArea());
+        room.setStatus(roomRequest.getStatus() != null ? roomRequest.getStatus() : room.getStatus());
+
+        Building oldBuilding = room.getBuilding();
+
+        // Update building
+        if (roomRequest.getBuilding() != null && !roomRequest.getBuilding().equals(oldBuilding.getName())) {
+            Optional<Building> optionalBuilding = buildingRepository.findByName(roomRequest.getBuilding());
+            Building newBuilding;
+
+            if (optionalBuilding.isPresent()) {
+                newBuilding = optionalBuilding.get();
+            } else {
+                newBuilding = Building.builder()
+                        .name(roomRequest.getBuilding())
+                        .address(roomRequest.getAddress())
+                        .numberOfRooms(1)
+                        .build();
+                newBuilding = buildingRepository.save(newBuilding);
+            }
+
+            // Update number of room in building
+            oldBuilding.setNumberOfRooms(Math.max(0, oldBuilding.getNumberOfRooms() - 1));
+            newBuilding.setNumberOfRooms(newBuilding.getNumberOfRooms() + 1);
+            buildingRepository.save(oldBuilding);
+            buildingRepository.save(newBuilding);
+
+            room.setBuilding(newBuilding);
+        } else {
+            // Update address when building not change
+            if (roomRequest.getAddress() != null && !roomRequest.getAddress().equals(oldBuilding.getAddress())) {
+                oldBuilding.setAddress(roomRequest.getAddress());
+                buildingRepository.save(oldBuilding);
+            }
+        }
+
+        // Uploaf new image and delete old image
+        if (roomRequest.getImage() != null && !roomRequest.getImage().isEmpty()) {
+            try {
+                List<Image> oldImages = imageRepository.findByRoom(room);
+
+                for (Image oldImage : oldImages) {
+                    cloudinaryService.deleteImage(oldImage.getUrl());
+                }
+                imageRepository.deleteAll(oldImages);
+                imageRepository.flush();
+
+                String imageUrl = cloudinaryService.uploadImage(roomRequest.getImage());
+
+                Image newImage = new Image();
+                newImage.setRoom(room);
+                newImage.setUrl(imageUrl);
+                imageRepository.save(newImage);
+            } catch (Exception e) {
+                throw new RuntimeException("Error when uploading image to Cloudinary", e);
+            }
+        }
+
+        roomRepository.save(room);
+
+        return new RoomResponse(
+                room.getId(),
+                room.getName(),
+                room.getType(),
+                room.getBuilding().getAddress(),
+                room.getBuilding().getName(),
+                room.getShortPrice(),
+                room.getMidPrice(),
+                room.getStatus(),
+                room.getImages().stream().map(Image::getUrl).collect(Collectors.toList())
+        );
+    }
+
 }
