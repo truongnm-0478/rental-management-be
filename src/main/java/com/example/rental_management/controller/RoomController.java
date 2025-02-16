@@ -24,9 +24,10 @@ public class RoomController {
     @GetMapping
     public Page<RoomResponse> getAllRooms(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String search
     ) {
-        return roomService.getAllRooms(page, size);
+        return roomService.getAllRooms(page, size, search);
     }
 
     // Get room by id

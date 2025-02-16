@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface RoomService {
-    Page<RoomResponse> getAllRooms(int page, int size);
+    Page<RoomResponse> getAllRooms(int page, int size, String search);
 
     RoomResponse getRoomById(Long id);
 

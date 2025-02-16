@@ -44,9 +44,15 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
-    public Page<RoomResponse> getAllRooms(int page, int size) {
+    public Page<RoomResponse> getAllRooms(int page, int size, String search) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<Room> roomsPage = roomRepository.findByDeletedAtIsNullAndBuilding_DeletedAtIsNull(pageable);
+        Page<Room> roomsPage;
+
+        if (search != null && !search.trim().isEmpty()) {
+            roomsPage = roomRepository.searchRooms(search, pageable);
+        } else {
+            roomsPage = roomRepository.findByDeletedAtIsNullAndBuilding_DeletedAtIsNull(pageable);
+        }
 
         return roomsPage.map(room -> {
             RoomResponse response = new RoomResponse();
