@@ -1,14 +1,21 @@
-# Sử dụng image OpenJDK làm base image
-FROM openjdk:17-jdk-slim
-
-# Cài đặt thư viện cần thiết và thiết lập thư mục làm việc
+FROM maven:3-openjdk-17 AS build
 WORKDIR /app
 
-# Copy file WAR vào container
-COPY target/rental-management-0.0.1-SNAPSHOT.war /app/rental-management-0.0.1-SNAPSHOT.war
+# Sao chép toàn bộ mã nguồn vào container
+COPY . .
 
-# Expose cổng mà ứng dụng Spring Boot sẽ chạy
+# Build ứng dụng và tạo file WAR
+RUN mvn clean package -DskipTests
+
+# Stage chạy ứng dụng
+FROM openjdk:17-jdk-slim
+WORKDIR /app
+
+# Sao chép file WAR từ build stage
+COPY --from=build /app/target/rental-management-0.0.1-SNAPSHOT.war drcomputer.war
+
+# Mở cổng 8080
 EXPOSE 8080
 
-# Lệnh để chạy ứng dụng khi container được khởi động
-ENTRYPOINT ["java", "-jar", "/app/rental-management-0.0.1-SNAPSHOT.war"]
+# Chạy ứng dụng Spring Boot
+ENTRYPOINT ["java", "-jar", "drcomputer.war"]
